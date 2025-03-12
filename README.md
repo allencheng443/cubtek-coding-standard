@@ -1,71 +1,93 @@
-# cubtek-coding-standard README
+# CubTEK Coding Standard Extension
 
-This is the README for your extension "cubtek-coding-standard". After writing up a brief description, we recommend including the following sections.
+A Visual Studio Code extension that provides formatting and checking capabilities for C/C++ code according to CubTEK's coding standards.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+This extension provides the following features:
 
-For example if there is an image subfolder under your extension project workspace:
+- **Automatic Code Formatting**: Formats your C/C++ code according to CubTEK's coding standards using clang-format
+- **Code Style Checking**: Validates your code against CubTEK's coding standards
+- **Real-time Diagnostics**: Shows coding standard violations as you type
+- **Project-wide Analysis**: Ability to check entire projects for compliance
+- **Compliance Reports**: Generate detailed compliance reports for your codebase
 
-\!\[feature X\]\(images/feature-x.png\)
+### Commands
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+The extension provides several commands accessible through the command palette:
+
+- `CubTEK: Check Current File` - Check the currently open file against coding standards
+- `CubTEK: Check Entire Project` - Run a compliance check on the entire project
+- `CubTEK: Show Compliance Report` - Generate and display a coding standard compliance report
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Visual Studio Code ^1.98.0
+- clang-format (for code formatting)
+- C/C++ files in your workspace
+
+## Installation
+
+1. Install Visual Studio Code 1.98.0 or higher
+2. Install clang-format on your system
+3. Install this extension from the VS Code marketplace
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- `cubtek.formatOnSave`: Enable/disable automatic formatting on save (default: `true`)
+- `cubtek.checkOnSave`: Enable/disable coding standard checking on save (default: `true`)
+- `cubtek.severity`: Set the severity level for diagnostics (`"error"`, `"warning"`, `"information"`, `"hint"`) (default: `"warning"`)
+- `cubtek.configPath`: Specify a custom path to the configuration file
+
+## Configuration
+
+The extension uses `.clang-format` for formatting rules. A default configuration is provided, but you can customize it by creating a `.clang-format` file in your project root.
+
+Example `.clang-format` configuration:
+
+```yaml
+Language: Cpp
+IndentWidth: 4
+UseTab: Never
+BreakBeforeBraces: Allman
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: true
+SpaceBeforeAssignmentOperators: true
+IndentCaseLabels: false
+ColumnLimit: 100
+AlignTrailingComments: true
+```
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- The extension currently only supports C/C++ files
+- Formatting requires clang-format to be installed on the system
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.0
 
-### 1.0.0
+Initial release of CubTEK Coding Standard extension:
 
-Initial release of ...
+- Basic code formatting support
+- Coding standard validation
+- Project-wide analysis capabilities
+- Configuration options for formatting and checking
 
-### 1.0.1
+## Contributing
 
-Fixed issue #.
+The extension is open for contributions. Please feel free to submit issues and pull requests on our repository.
 
-### 1.1.0
+## License
 
-Added features X, Y, and Z.
+This extension is licensed under the [MIT License](LICENSE).
+
+## Support
+
+If you encounter any problems or have suggestions, please file an issue on our [GitHub repository](https://github.com/yourusername/cubtek-coding-standard).
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+**Note**: This extension is currently in development. Features and configurations may change in future releases.
