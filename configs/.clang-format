@@ -1,0 +1,19 @@
+# configs/.clang-format
+# CubTEK C/C++ Style Guide (based on Google style)
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 80
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBraces: Allman
+IndentCaseLabels: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignTrailingComments: true
+SpacesBeforeTrailingComments: 2
+SpaceAfterCStyleCast: true
+PointerAlignment: Right
+SortIncludes: true
