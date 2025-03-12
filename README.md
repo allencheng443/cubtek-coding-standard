@@ -82,11 +82,11 @@ The extension is open for contributions. Please feel free to submit issues and p
 
 ## License
 
-This extension is licensed under the [MIT License](LICENSE).
+This extension is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Support
 
-If you encounter any problems or have suggestions, please file an issue on our [GitHub repository](https://github.com/yourusername/cubtek-coding-standard).
+If you encounter any problems or have suggestions, please file an issue on our [GitHub repository](https://github.com/allencheng443/cubtek-coding-standard).
 
 ---
 
