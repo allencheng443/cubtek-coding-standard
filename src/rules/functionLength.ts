@@ -1,18 +1,40 @@
-// src/rules/functionLength.ts
-import * as vscode from 'vscode';
-import { Rule } from './ruleBase';
+/**
+ * Function Length Rule Implementation
+ *
+ * This module provides a rule that checks and warns about functions exceeding
+ * a maximum allowed length. Long functions can be difficult to understand,
+ * test, and maintain, making this rule important for code quality.
+ */
+import * as vscode from "vscode";
+import { Rule } from "./ruleBase";
 
+/**
+ * Rule that enforces maximum function length.
+ * Analyzes code to identify functions that exceed a specified line count limit.
+ * @extends Rule
+ */
 export class FunctionLengthRule extends Rule {
+  /**
+   * Creates a new instance of the FunctionLengthRule.
+   * Initializes the rule with its metadata including ID, name, description,
+   * category, and default severity level.
+   */
   constructor() {
     super({
-      id: 'CUBTEK-FUNC-001',
-      name: 'Function Length',
-      description: 'Functions should not exceed the maximum allowed length',
-      category: 'Maintainability',
+      id: "CUBTEK-FUNC-001",
+      name: "Function Length",
+      description: "Functions should not exceed the maximum allowed length",
+      category: "Maintainability",
       defaultSeverity: vscode.DiagnosticSeverity.Warning,
     });
   }
 
+  /**
+   * Analyzes a document to check for functions that exceed the maximum allowed length.
+   *
+   * @param {vscode.TextDocument} document - The document to analyze
+   * @returns {Promise<vscode.Diagnostic[]>} Array of diagnostics for functions exceeding the maximum length
+   */
   async check(document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
     const diagnostics: vscode.Diagnostic[] = [];
     const text = document.getText();
@@ -57,6 +79,14 @@ export class FunctionLengthRule extends Rule {
     return diagnostics;
   }
 
+  /**
+   * Finds the end position of a function by tracking opening and closing braces.
+   *
+   * @param {vscode.TextDocument} document - The document containing the function
+   * @param {vscode.Position} startPos - The starting position of the function
+   * @returns {vscode.Position | null} The position of the function's closing brace, or null if not found
+   * @private
+   */
   private findFunctionEnd(
     document: vscode.TextDocument,
     startPos: vscode.Position
@@ -68,10 +98,10 @@ export class FunctionLengthRule extends Rule {
     for (let i = document.offsetAt(startPos); i < text.length; i++) {
       const char = text.charAt(i);
 
-      if (char === '{') {
+      if (char === "{") {
         foundFirstBrace = true;
         braceCount++;
-      } else if (char === '}') {
+      } else if (char === "}") {
         braceCount--;
 
         if (foundFirstBrace && braceCount === 0) {

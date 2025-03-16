@@ -1,48 +1,87 @@
-// src/utils/config.ts
-import * as fs from 'fs';
-import * as path from 'path';
-import * as vscode from 'vscode';
+/**
+ * Configuration management module for the CubTEK extension.
+ * Handles loading, parsing, and maintaining configuration settings from various sources.
+ * @module config
+ */
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
 
+/**
+ * Interface representing the complete CubTEK extension configuration.
+ * @interface CubtekConfig
+ */
 export interface CubtekConfig {
+  /** Determines if code formatting should be applied on save */
   formatOnSave: boolean;
+  /** Determines if code checking should be performed on save */
   checkOnSave: boolean;
-  severity: 'error' | 'warning' | 'information' | 'hint';
+  /** The default severity level for rule violations */
+  severity: "error" | "warning" | "information" | "hint";
+  /** Path to the project-specific configuration file */
   configPath: string;
+  /** Map of rule IDs to their configurations */
   rules: Record<string, RuleConfig>;
 }
 
+/**
+ * Interface representing the configuration for an individual rule.
+ * @interface RuleConfig
+ */
 export interface RuleConfig {
+  /** Determines if the rule is active */
   enabled: boolean;
-  severity?: 'error' | 'warning' | 'information' | 'hint';
+  /** Optional severity level for this specific rule, overrides the global setting */
+  severity?: "error" | "warning" | "information" | "hint";
+  /** Optional parameters for rule customization */
   params?: Record<string, any>;
 }
 
+/**
+ * Manages the configuration for the CubTEK extension.
+ * Handles loading settings from VS Code configuration and project-specific config files.
+ */
 export class ConfigManager {
+  /** Current active configuration */
   private config: CubtekConfig;
+
+  /**
+   * Default rule configurations that apply when no overrides are present
+   * @private
+   */
   private readonly defaultRules: Record<string, RuleConfig> = {
-    'CUBTEK-FUNC-001': {
+    "CUBTEK-FUNC-001": {
       enabled: true,
-      severity: 'warning',
+      severity: "warning",
       params: { maxLines: 50 },
     },
-    'CUBTEK-NAME-001': {
+    "CUBTEK-NAME-001": {
       enabled: true,
-      severity: 'warning',
+      severity: "warning",
     },
     // Add more default rules here
   };
 
+  /**
+   * Creates a new ConfigManager instance.
+   * @param context - The VS Code extension context
+   */
   constructor(private readonly context: vscode.ExtensionContext) {
     // Initialize with default configuration
     this.config = {
       formatOnSave: true,
       checkOnSave: true,
-      severity: 'warning',
-      configPath: '',
+      severity: "warning",
+      configPath: "",
       rules: { ...this.defaultRules },
     };
   }
 
+  /**
+   * Initializes the configuration by loading settings from VS Code
+   * and project-specific configuration files.
+   * @returns Promise that resolves when configuration is fully loaded
+   */
   async initialize(): Promise<void> {
     // Load VSCode settings
     this.loadVSCodeSettings();
@@ -51,15 +90,25 @@ export class ConfigManager {
     await this.loadProjectConfig();
   }
 
+  /**
+   * Loads configuration settings from VS Code's configuration.
+   * @private
+   */
   private loadVSCodeSettings(): void {
-    const vsconfig = vscode.workspace.getConfiguration('cubtek');
+    const vsconfig = vscode.workspace.getConfiguration("cubtek");
 
-    this.config.formatOnSave = vsconfig.get('formatOnSave', true);
-    this.config.checkOnSave = vsconfig.get('checkOnSave', true);
-    this.config.severity = vsconfig.get('severity', 'warning') as any;
-    this.config.configPath = vsconfig.get('configPath', '');
+    this.config.formatOnSave = vsconfig.get("formatOnSave", true);
+    this.config.checkOnSave = vsconfig.get("checkOnSave", true);
+    this.config.severity = vsconfig.get("severity", "warning") as any;
+    this.config.configPath = vsconfig.get("configPath", "");
   }
 
+  /**
+   * Loads project-specific configuration from a configuration file.
+   * If no configuration file exists, extracts default configurations to the workspace.
+   * @private
+   * @returns Promise that resolves when project configuration is loaded
+   */
   private async loadProjectConfig(): Promise<void> {
     try {
       let configPath = this.config.configPath;
@@ -70,8 +119,8 @@ export class ConfigManager {
         if (workspaceFolders && workspaceFolders.length > 0) {
           const rootPath = workspaceFolders[0].uri.fsPath;
           const defaultPaths = [
-            path.join(rootPath, '.cubtek.json'),
-            path.join(rootPath, '.vscode', 'cubtek-config.json'),
+            path.join(rootPath, ".cubtek.json"),
+            path.join(rootPath, ".vscode", "cubtek-config.json"),
           ];
 
           for (const p of defaultPaths) {
@@ -85,7 +134,7 @@ export class ConfigManager {
 
       // Load config file if found
       if (configPath && fs.existsSync(configPath)) {
-        const fileContent = fs.readFileSync(configPath, 'utf8');
+        const fileContent = fs.readFileSync(configPath, "utf8");
         const projectConfig = JSON.parse(fileContent);
 
         // Merge with defaults
@@ -116,6 +165,12 @@ export class ConfigManager {
     }
   }
 
+  /**
+   * Extracts default configuration files to the workspace.
+   * Creates necessary directories and copies configuration templates from extension resources.
+   * @private
+   * @returns Promise that resolves when extraction completes
+   */
   private async extractDefaultConfigs(): Promise<void> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -123,7 +178,7 @@ export class ConfigManager {
     }
 
     const rootPath = workspaceFolders[0].uri.fsPath;
-    const vscodePath = path.join(rootPath, '.vscode');
+    const vscodePath = path.join(rootPath, ".vscode");
 
     // Create .vscode directory if it doesn't exist
     if (!fs.existsSync(vscodePath)) {
@@ -135,22 +190,22 @@ export class ConfigManager {
       {
         source: path.join(
           this.context.extensionPath,
-          'configs',
-          '.clang-format'
+          "configs",
+          ".clang-format"
         ),
-        target: path.join(rootPath, '.clang-format'),
+        target: path.join(rootPath, ".clang-format"),
       },
       {
-        source: path.join(this.context.extensionPath, 'configs', '.clang-tidy'),
-        target: path.join(rootPath, '.clang-tidy'),
+        source: path.join(this.context.extensionPath, "configs", ".clang-tidy"),
+        target: path.join(rootPath, ".clang-tidy"),
       },
       {
         source: path.join(
           this.context.extensionPath,
-          'configs',
-          'cubtek-config.json'
+          "configs",
+          "cubtek-config.json"
         ),
-        target: path.join(vscodePath, 'cubtek-config.json'),
+        target: path.join(vscodePath, "cubtek-config.json"),
       },
     ];
 
@@ -161,14 +216,28 @@ export class ConfigManager {
     }
   }
 
+  /**
+   * Returns the current configuration.
+   * @returns The current CubTEK configuration
+   */
   getConfig(): CubtekConfig {
     return this.config;
   }
 
+  /**
+   * Gets the configuration for a specific rule.
+   * @param ruleId - The ID of the rule to retrieve
+   * @returns The rule configuration or undefined if the rule doesn't exist
+   */
   getRuleConfig(ruleId: string): RuleConfig | undefined {
     return this.config.rules[ruleId];
   }
 
+  /**
+   * Updates the current configuration with new values.
+   * @param newConfig - Partial configuration with values to update
+   * @returns Promise that resolves when the update is complete
+   */
   async updateConfig(newConfig: Partial<CubtekConfig>): Promise<void> {
     // Update in-memory config
     this.config = { ...this.config, ...newConfig };

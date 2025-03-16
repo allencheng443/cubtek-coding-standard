@@ -1,23 +1,40 @@
-// src/core/checker.ts
-import * as cp from 'child_process';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import * as vscode from 'vscode';
-import { RuleRegistry } from '../rules/ruleRegistry';
-import { ConfigManager } from '../utils/config';
+import * as cp from "child_process";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
+import { RuleRegistry } from "../rules/ruleRegistry";
+import { ConfigManager } from "../utils/config";
 
+/**
+ * CubtekChecker is responsible for performing code quality checks on C/C++ files.
+ * It combines clang-tidy static analysis with custom rule checks to provide
+ * comprehensive diagnostics for the code.
+ */
 export class CubtekChecker {
+  /** Registry containing all available rules */
   private ruleRegistry: RuleRegistry;
 
+  /**
+   * Creates a new instance of the CubtekChecker.
+   *
+   * @param configManager - The configuration manager that controls rule settings and checker options
+   */
   constructor(private readonly configManager: ConfigManager) {
     this.ruleRegistry = new RuleRegistry(configManager);
   }
 
+  /**
+   * Checks a document for code quality issues using both clang-tidy and custom rules.
+   * Only processes C/C++ files; returns empty array for other file types.
+   *
+   * @param document - The VSCode text document to check
+   * @returns A promise that resolves to an array of diagnostic issues found in the document
+   */
   async checkDocument(
     document: vscode.TextDocument
   ): Promise<vscode.Diagnostic[]> {
-    if (document.languageId !== 'c' && document.languageId !== 'cpp') {
+    if (document.languageId !== "c" && document.languageId !== "cpp") {
       return [];
     }
 
@@ -35,12 +52,21 @@ export class CubtekChecker {
       return diagnostics;
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        error instanceof Error ? error.message : "Unknown error";
       vscode.window.showErrorMessage(`Checker error: ${errorMessage}`);
       return [];
     }
   }
 
+  /**
+   * Runs clang-tidy on the document to find standard C/C++ code quality issues.
+   * Creates a temporary file to run clang-tidy and collects its output.
+   *
+   * @param document - The VSCode text document to check
+   * @returns A promise that resolves to an array of diagnostics from clang-tidy
+   * @throws Error if clang-tidy is not installed or encounters an error during execution
+   * @private
+   */
   private async runClangTidy(
     document: vscode.TextDocument
   ): Promise<vscode.Diagnostic[]> {
@@ -54,32 +80,32 @@ export class CubtekChecker {
         fs.writeFileSync(tempFile, document.getText());
 
         // Run clang-tidy
-        const args = [tempFile, '-quiet', '--export-fixes=/dev/null'];
+        const args = [tempFile, "-quiet", "--export-fixes=/dev/null"];
 
         const workspaceFolder = vscode.workspace.getWorkspaceFolder(
           document.uri
         )?.uri.fsPath;
         if (workspaceFolder) {
           // Look for .clang-tidy in workspace
-          const clangTidyPath = path.join(workspaceFolder, '.clang-tidy');
+          const clangTidyPath = path.join(workspaceFolder, ".clang-tidy");
           if (fs.existsSync(clangTidyPath)) {
             args.push(`--config-file=${clangTidyPath}`);
           }
         }
 
-        const tidyProcess = cp.spawn('clang-tidy', args);
-        let stdout = '';
-        let stderr = '';
+        const tidyProcess = cp.spawn("clang-tidy", args);
+        let stdout = "";
+        let stderr = "";
 
-        tidyProcess.stdout.on('data', (data) => {
+        tidyProcess.stdout.on("data", (data) => {
           stdout += data.toString();
         });
 
-        tidyProcess.stderr.on('data', (data) => {
+        tidyProcess.stderr.on("data", (data) => {
           stderr += data.toString();
         });
 
-        tidyProcess.on('close', (code) => {
+        tidyProcess.on("close", (code) => {
           try {
             // Delete temp file
             if (fs.existsSync(tempFile)) {
@@ -93,14 +119,14 @@ export class CubtekChecker {
           }
         });
 
-        tidyProcess.on('error', (err) => {
+        tidyProcess.on("error", (err) => {
           if (fs.existsSync(tempFile)) {
             fs.unlinkSync(tempFile);
           }
 
-          if (err.message.includes('ENOENT')) {
+          if (err.message.includes("ENOENT")) {
             reject(
-              new Error('clang-tidy not found. Please install clang-tidy.')
+              new Error("clang-tidy not found. Please install clang-tidy.")
             );
           } else {
             reject(err);
@@ -112,12 +138,22 @@ export class CubtekChecker {
     });
   }
 
+  /**
+   * Parses the output from clang-tidy into VSCode diagnostic objects.
+   * Extracts information including file path, line numbers, column positions,
+   * severity levels, messages, and rule identifiers.
+   *
+   * @param output - The string output from the clang-tidy process
+   * @param document - The document being checked
+   * @returns An array of VSCode diagnostics created from the clang-tidy output
+   * @private
+   */
   private parseClangTidyOutput(
     output: string,
     document: vscode.TextDocument
   ): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
-    const lines = output.split('\n');
+    const lines = output.split("\n");
 
     // Pattern to match clang-tidy output lines
     // Example: /path/to/file.c:10:5: warning: some message [rule-name]
@@ -145,9 +181,9 @@ export class CubtekChecker {
 
         // Determine severity
         let severity: vscode.DiagnosticSeverity;
-        if (levelStr === 'error') {
+        if (levelStr === "error") {
           severity = vscode.DiagnosticSeverity.Error;
-        } else if (levelStr === 'warning') {
+        } else if (levelStr === "warning") {
           severity = vscode.DiagnosticSeverity.Warning;
         } else {
           severity = vscode.DiagnosticSeverity.Information;
@@ -160,7 +196,7 @@ export class CubtekChecker {
           severity
         );
 
-        diagnostic.source = 'CubTEK (clang-tidy)';
+        diagnostic.source = "CubTEK (clang-tidy)";
         diagnostic.code = ruleId;
 
         diagnostics.push(diagnostic);
@@ -173,6 +209,15 @@ export class CubtekChecker {
     return diagnostics;
   }
 
+  /**
+   * Runs all enabled custom rule checks on the document.
+   * Each rule is executed independently and all resulting diagnostics are collected.
+   * Errors in individual rules are caught to prevent the entire check from failing.
+   *
+   * @param document - The VSCode text document to check
+   * @returns A promise that resolves to an array of diagnostics from custom rules
+   * @private
+   */
   private async runCustomRuleChecks(
     document: vscode.TextDocument
   ): Promise<vscode.Diagnostic[]> {

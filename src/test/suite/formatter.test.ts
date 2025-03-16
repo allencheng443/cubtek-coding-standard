@@ -1,16 +1,28 @@
-import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as vscode from 'vscode';
-import { CubtekFormatter } from '../../core/formatter';
-import { ConfigManager } from '../../utils/config';
+/**
+ * @file Formatter test suite for testing the CubtekFormatter functionality
+ * @description Tests the code formatting capabilities using clang-format configuration
+ */
+import * as assert from "assert";
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
+import { CubtekFormatter } from "../../core/formatter";
+import { ConfigManager } from "../../utils/config";
 
-// 修改 clang-format 配置
+/**
+ * Custom clang-format configuration for testing
+ * Defines formatting rules like:
+ * - 4-space indentation
+ * - Allman style braces (braces on new lines)
+ * - Specific spacing rules for operators and parentheses
+ * - 100 character column limit
+ * - No single-line if statements
+ */
 const clangFormatConfig = `---
 Language: Cpp
 IndentWidth: 4
 UseTab: Never
-BreakBeforeBraces: Allman     # 修改：使用 Allman 風格（大括號換新行）
+BreakBeforeBraces: Allman
 SpaceBeforeParens: ControlStatements
 SpaceAfterCStyleCast: true
 SpaceBeforeAssignmentOperators: true
@@ -20,19 +32,28 @@ SpacesInContainerLiterals: false
 IndentCaseLabels: false
 ColumnLimit: 100
 AlignTrailingComments: true
-AllowShortIfStatementsOnASingleLine: false  # 新增：禁止單行 if 語句
+AllowShortIfStatementsOnASingleLine: false
 AlwaysBreakBeforeMultilineStrings: true
 `;
 
-suite('Formatter Test Suite', () => {
+/**
+ * Test suite for verifying the Formatter functionality
+ * Tests that code formatting works correctly with given configuration
+ */
+suite("Formatter Test Suite", () => {
   let formatter: CubtekFormatter;
   let configManager: ConfigManager;
 
+  /**
+   * One-time setup before all tests in the suite
+   * Initializes the ConfigManager and CubtekFormatter with a mock VSCode extension context
+   * @returns {Promise<void>} Promise that resolves when setup is complete
+   */
   suiteSetup(async () => {
-    // 建立 config manager with mock context
+    // Create config manager with mock context
     const context = {
-      extensionPath: path.join(__dirname, '../../../'),
-      globalStoragePath: path.join(__dirname, '../../../test-data'),
+      extensionPath: path.join(__dirname, "../../../"),
+      globalStoragePath: path.join(__dirname, "../../../test-data"),
       subscriptions: [],
       workspaceState: { get: () => {}, update: () => {} },
       globalState: { get: () => {}, update: () => {} },
@@ -43,62 +64,69 @@ suite('Formatter Test Suite', () => {
     formatter = new CubtekFormatter(configManager);
   });
 
-  test('Format C Document', async function () {
+  /**
+   * Test case for formatting C code documents
+   * Creates a test file, applies formatting, and verifies the results match expectations
+   *
+   * @this {Mocha.Context} Mocha test context
+   * @returns {Promise<void>} Promise that resolves when test is complete
+   */
+  test("Format C Document", async function () {
     this.timeout(10000);
 
     try {
-      // 確保 .clang-format 檔案存在
+      // Ensure the .clang-format configuration file exists
       const clangFormatPath = path.join(
         __dirname,
-        '../../../test-data/.clang-format'
+        "../../../test-data/.clang-format"
       );
       if (!fs.existsSync(path.dirname(clangFormatPath))) {
         fs.mkdirSync(path.dirname(clangFormatPath), { recursive: true });
       }
       fs.writeFileSync(clangFormatPath, clangFormatConfig);
 
-      // 建立測試檔案
-      const testFilePath = path.join(__dirname, '../../../test-data/test.c');
-      const content = 'void testFunction() { int x=5;if(x>3){x=4;} }';
-      console.log('Writing test content:', content);
+      // Create a test file with unformatted C code
+      const testFilePath = path.join(__dirname, "../../../test-data/test.c");
+      const content = "void testFunction() { int x=5;if(x>3){x=4;} }";
+      console.log("Writing test content:", content);
       fs.writeFileSync(testFilePath, content);
 
-      console.log('Opening document...');
+      console.log("Opening document...");
       const uri = vscode.Uri.file(testFilePath);
       const document = await vscode.workspace.openTextDocument(uri);
 
-      console.log('Formatting document...');
+      console.log("Formatting document...");
       const edits = await formatter.provideDocumentFormattingEdits(document);
 
-      console.log('Checking formatting results...');
-      assert.strictEqual(edits.length, 1, 'Expected exactly one edit');
+      console.log("Checking formatting results...");
+      assert.strictEqual(edits.length, 1, "Expected exactly one edit");
       const formattedText = edits[0].newText;
 
-      // 輸出格式化後的文字以便偵錯
-      console.log('Formatted text:', formattedText);
+      // Output formatted text for debugging purposes
+      console.log("Formatted text:", formattedText);
 
-      // 驗證格式化結果
+      // Validate that formatting matches expected patterns
       assert.ok(
-        formattedText.includes('{\n    int'),
-        'Expected proper indentation after opening brace'
+        formattedText.includes("{\n    int"),
+        "Expected proper indentation after opening brace"
       );
       assert.ok(
-        formattedText.includes('if (x > 3)\n    {'),
-        'Expected proper spacing and newline in if statement'
+        formattedText.includes("if (x > 3)\n    {"),
+        "Expected proper spacing and newline in if statement"
       );
     } catch (error) {
-      console.error('Test failed with error:', error);
+      console.error("Test failed with error:", error);
       throw error;
     } finally {
-      // 清理測試檔案
-      const testFilePath = path.join(__dirname, '../../../test-data/test.c');
+      // Clean up test file
+      const testFilePath = path.join(__dirname, "../../../test-data/test.c");
       if (fs.existsSync(testFilePath)) {
         fs.unlinkSync(testFilePath);
       }
-      // 清理 .clang-format 檔案
+      // Clean up .clang-format file
       const clangFormatPath = path.join(
         __dirname,
-        '../../../test-data/.clang-format'
+        "../../../test-data/.clang-format"
       );
       if (fs.existsSync(clangFormatPath)) {
         fs.unlinkSync(clangFormatPath);

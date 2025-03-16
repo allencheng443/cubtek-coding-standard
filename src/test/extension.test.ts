@@ -1,15 +1,36 @@
-import * as assert from 'assert';
+/**
+ * @file Extension Test Suite for VSCode extension
+ * @description Contains test cases to verify extension functionality
+ */
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode';
+import * as assert from "assert";
+
+/**
+ * All VSCode API is available through the 'vscode' module
+ * The extension can also be imported for testing
+ */
+import * as vscode from "vscode";
 // import * as myExtension from '../../extension';
 
-suite('Extension Test Suite', () => {
-	vscode.window.showInformationMessage('Start all tests.');
+/**
+ * @description Main test suite for the extension
+ * Defines a collection of tests to verify extension functionality
+ */
+suite("Extension Test Suite", () => {
+  /**
+   * Display an information message when tests start running
+   */
+  vscode.window.showInformationMessage("Start all tests.");
 
-	test('Sample test', () => {
-		assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-		assert.strictEqual(-1, [1, 2, 3].indexOf(0));
-	});
+  /**
+   * @description Basic test case to verify assertion functionality
+   * Tests the indexOf method behavior with values not present in the array
+   */
+  test("Sample test", () => {
+    /**
+     * Verifies that indexOf returns -1 when the value is not present in the array
+     */
+    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
+    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+  });
 });
