@@ -2,12 +2,12 @@
  * @file Formatter test suite for testing the CubtekFormatter functionality
  * @description Tests the code formatting capabilities using clang-format configuration
  */
+import { CubtekFormatter } from "@/core/formatter";
+import { ConfigManager } from "@/utils/config";
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { CubtekFormatter } from "../../core/formatter";
-import { ConfigManager } from "../../utils/config";
 
 /**
  * Custom clang-format configuration for testing

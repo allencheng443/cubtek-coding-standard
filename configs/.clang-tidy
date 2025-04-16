@@ -1,4 +1,9 @@
-# configs/.clang-tidy
+# CubTEK C/C++ Static Analysis Configuration
+# Version: 2.0
+# Last Updated: 2025-03-27
+# Corresponds to Coding Standard Version: 2.0
+
+# Main check categories
 Checks: >
   bugprone-*,
   cert-*,
@@ -10,21 +15,54 @@ Checks: >
   performance-*,
   portability-*,
   readability-*,
-  -cppcoreguidelines-pro-type-reinterpret-cast,
-  -cppcoreguidelines-pro-type-union-access,
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-  -modernize-use-trailing-return-type
+  # Disabled checks - documented with reasons
+  -cppcoreguidelines-pro-type-reinterpret-cast,  # Needed for hardware access in embedded systems
+  -cppcoreguidelines-pro-type-union-access,      # Common for memory-mapped registers
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,  # Required for low-level operations
+  -modernize-use-trailing-return-type,           # Not part of our coding standard
 
+# Check options - organized by category
 CheckOptions:
+  # Function structure limits
   - key: readability-function-size.LineThreshold
-    value: "50"
+    value: "50" # Maximum function length per coding standard
   - key: readability-function-size.ParameterThreshold
-    value: "5"
+    value: "5" # Maximum parameter count
+  - key: readability-function-size.StatementThreshold
+    value: "50" # Maximum statements in function
   - key: readability-function-cognitive-complexity.Threshold
-    value: "25"
+    value: "25" # Maximum cognitive complexity
+
+  # Naming conventions
   - key: readability-identifier-naming.GlobalVariablePrefix
     value: "g_"
   - key: readability-identifier-naming.StaticVariablePrefix
     value: "s_"
   - key: readability-identifier-naming.FunctionCase
     value: "camelBack"
+  - key: readability-identifier-naming.ClassCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.StructCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.EnumCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.ConstantCase
+    value: "UPPER_CASE"
+  - key: readability-identifier-naming.ParameterCase
+    value: "camelBack"
+  - key: readability-identifier-naming.VariableCase
+    value: "camelBack"
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: "UPPER_CASE"
+
+  # Safety considerations
+  - key: bugprone-signed-char-misuse.CharTypdefsToIgnore
+    value: ""
+  - key: cert-dcl16-c.NewSuffixes
+    value: "L;LL;LU;LLU"
+  - key: cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
+    value: "0"
+
+  # Header guards
+  - key: llvm-header-guard.HeaderFileExtensions
+    value: ";h;hh;hpp;hxx"

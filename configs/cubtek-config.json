@@ -1,19 +1,79 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "formatOnSave": true,
   "checkOnSave": true,
   "severity": "warning",
+  "reportPath": "./cubtek-reports",
+  "excludePaths": [
+    "**/vendor/**",
+    "**/tests/**"
+  ],
   "rules": {
     "CUBTEK-FUNC-001": {
       "enabled": true,
       "severity": "warning",
+      "description": "Function length exceeds maximum lines",
       "params": {
-        "maxLines": 50
+        "maxLines": 50,
+        "maxComplexity": 25
       }
     },
     "CUBTEK-NAME-001": {
       "enabled": true,
-      "severity": "warning"
+      "severity": "warning",
+      "description": "Naming convention violations",
+      "params": {
+        "globalPrefix": "g_",
+        "staticPrefix": "s_",
+        "constantCase": "UPPER_CASE",
+        "functionCase": "camelBack",
+        "variableCase": "camelBack",
+        "typeCase": "CamelCase"
+      }
+    },
+    "CUBTEK-SAFETY-001": {
+      "enabled": true,
+      "severity": "error",
+      "description": "Missing null pointer check",
+      "params": {
+        "enforceAll": true
+      }
+    },
+    "CUBTEK-MEMORY-001": {
+      "enabled": true,
+      "severity": "error",
+      "description": "Memory allocation without proper error handling",
+      "params": {
+        "checkFree": true
+      }
+    },
+    "CUBTEK-COMMENT-001": {
+      "enabled": true,
+      "severity": "info",
+      "description": "Function header documentation",
+      "params": {
+        "requireParams": true,
+        "requireReturn": true
+      }
     }
+  },
+  "fileTypes": {
+    "headers": {
+      "rules": {
+        "CUBTEK-INCLUDE-001": {
+          "enabled": true,
+          "description": "Header guard convention check"
+        }
+      }
+    },
+    "sources": {
+      "excludeRules": [
+        "CUBTEK-INCLUDE-001"
+      ]
+    }
+  },
+  "integrations": {
+    "clangFormat": ".clang-format",
+    "clangTidy": ".clang-tidy"
   }
 }
