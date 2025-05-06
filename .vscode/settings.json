@@ -15,8 +15,9 @@
     "prettier.singleQuote": true,
     "prettier.jsxSingleQuote": false
   },
-  // "editor.fontFamily": "'Mapple Mono NF CN', Menlo, Monaco, 'Courier New', monospace",
-  // "editor.fontSize": 16,
-  // "editor.fontWeight": "400",
-  "cSpell.enabled": false
+  "editor.fontFamily": "'Mapple Mono NF CN', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontSize": 16,
+  "editor.fontWeight": "400",
+  "cSpell.enabled": false,
+  "npm.packageManager": "auto"
 }

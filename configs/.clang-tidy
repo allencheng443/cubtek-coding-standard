@@ -1,7 +1,7 @@
 # CubTEK C/C++ Static Analysis Configuration
-# Version: 2.0
+# Version: 1.1.0
 # Last Updated: 2025-03-27
-# Corresponds to Coding Standard Version: 2.0
+# Corresponds to Coding Standard Version: 1.1.0
 
 # Main check categories
 Checks: >

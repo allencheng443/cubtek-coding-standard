@@ -1,13 +1,10 @@
 {
-  "version": "2.0",
+  "version": "1.1.0",
   "formatOnSave": true,
   "checkOnSave": true,
   "severity": "warning",
   "reportPath": "./cubtek-reports",
-  "excludePaths": [
-    "**/vendor/**",
-    "**/tests/**"
-  ],
+  "excludePaths": ["**/vendor/**", "**/tests/**"],
   "rules": {
     "CUBTEK-FUNC-001": {
       "enabled": true,
@@ -67,9 +64,7 @@
       }
     },
     "sources": {
-      "excludeRules": [
-        "CUBTEK-INCLUDE-001"
-      ]
+      "excludeRules": ["CUBTEK-INCLUDE-001"]
     }
   },
   "integrations": {

@@ -1,7 +1,7 @@
 # CubTEK C/C++ Coding Standard Formatting Configuration
-# Version: 2.1
+# Version: 1.1.0
 # Last Updated: 2025-04-16
-# Corresponds to Coding Standard Version: 2.0
+# Corresponds to Coding Standard Version: 1.1.0
 
 ---
 BasedOnStyle: Microsoft
