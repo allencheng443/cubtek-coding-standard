@@ -139,6 +139,41 @@ CheckOptions:
 - **格式違規**：自動修復格式問題
 - **文檔問題**：提供標準文檔結構建議
 
+## 開發架構
+
+擴充套件採用模組化的架構設計，遵循 Google 風格指南的最佳實踐：
+
+### 1. 類型定義 (Types)
+
+所有介面和類型定義集中在 `src/types` 目錄下管理：
+
+- `rule.ts` - 定義規則相關介面
+- `config.ts` - 配置相關類型
+- `diagnostic.ts` - 診斷相關類型
+
+### 2. 常數管理 (Constants)
+
+常數集中在 `src/constants` 目錄下管理，提高維護性和一致性：
+
+- `errorCodes.ts` - 錯誤碼和規則 ID
+- `regexPatterns.ts` - 正則表達式模式
+- `messages.ts` - 提示訊息
+- `defaults.ts` - 默認配置值
+- `paths.ts` - 檔案路徑
+- `commands.ts` - 命令 ID
+
+### 3. 核心功能 (Core)
+
+- `formatter.ts` - 處理程式碼格式化
+- `checker.ts` - 管理程式碼檢查
+- `quickFix.ts` - 提供快速修復功能
+
+### 4. 規則系統 (Rules)
+
+- `ruleBase.ts` - 規則基類
+- `ruleRegistry.ts` - 規則註冊和管理
+- 自訂規則實現 (如 `functionLength.ts`, `namingConvention.ts`)
+
 ## 已知問題
 
 - 擴充套件目前僅支援 C/C++ 檔案
@@ -148,7 +183,15 @@ CheckOptions:
 
 ## 版本說明
 
-### 1.1.0（當前版本）
+### 1.2.0 (開發中)
+
+- 重構程式碼架構，提高可維護性
+- 類型定義集中管理至 `src/types` 目錄
+- 常數集中管理至 `src/constants` 目錄
+- 優化 VSCode 測試環境配置
+- 改進錯誤處理和診斷訊息
+
+### 1.1.0
 
 - 加入快速修復功能
 - 改進規則註冊系統

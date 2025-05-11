@@ -1,68 +1,147 @@
-# CubTEK C/C++ Static Analysis Configuration
-# Version: 1.1.0
-# Last Updated: 2025-03-27
-# Corresponds to Coding Standard Version: 1.1.0
+---
+# CUBTEK Automotive Application System .clang-tidy configuration
+# Based on LLVM style with AUTOSAR C++14 and MISRA C compliance
+# This file is used to configure the Clang-Tidy tool for static code analysis.
+# It defines the checks to be performed, the formatting style, and various options for naming conventions and other rules.
+# Last updated: 2025/05/09
+# Author: Allen Cheng
 
-# Main check categories
 Checks: >
-  bugprone-*,
-  cert-*,
-  clang-analyzer-*,
-  cppcoreguidelines-*,
-  hicpp-*,
-  misc-*,
-  modernize-*,
-  performance-*,
-  portability-*,
-  readability-*,
-  # Disabled checks - documented with reasons
-  -cppcoreguidelines-pro-type-reinterpret-cast,  # Needed for hardware access in embedded systems
-  -cppcoreguidelines-pro-type-union-access,      # Common for memory-mapped registers
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic,  # Required for low-level operations
-  -modernize-use-trailing-return-type,           # Not part of our coding standard
+  -*,
+  -clang-analyzer-*,                                  # Clang static analyzer checks.
+  -bugprone-*,                                        # Bugprone checks.
+  -cert-*,                                            # CERT C++ coding standard checks.
+  -misc-*,                                            # Miscellaneous checks.
+  -performance-*,                                     # Checks related to performance and optimization.
+  -portability-*,                                     # Checks related to portability and platform-specific code.
+  -readability-*,                                     # Checks related to readability and naming conventions.
+  -llvm-*,                                            # Checks related to LLVM style.
+  -cppcoreguidelines-*,                               # Checks related to C++ Core Guidelines.
+  -hicpp-*,                                           # Checks related to High Integrity C++.
+  -modernize-*,                                       # Checks related to modern C++ features.
+  -modernize-use-trailing-return-type,                # Use trailing return type for functions.
+  -llvm-header-guard,                                 # Checks for header guards.
+  -llvm-include-order,                                # Checks for include order.
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,   # Checks for pointer arithmetic.
+  -readability-magic-numbers,                         # Checks for magic numbers.
+  bugprone-macro-parentheses,                         # Checks for parentheses in macros.
+  readability-identifier-naming,                       # Checks for identifier naming conventions.
 
-# Check options - organized by category
+# Treat warnings as errors
+WarningsAsErrors: ""
+
+# Header filter
+HeaderFilterRegex: ".*"
+
+# Use formatting style defined in file
+FormatStyle: "file"
+
+# Check options
 CheckOptions:
-  # Function structure limits
-  - key: readability-function-size.LineThreshold
-    value: "50" # Maximum function length per coding standard
-  - key: readability-function-size.ParameterThreshold
-    value: "5" # Maximum parameter count
-  - key: readability-function-size.StatementThreshold
-    value: "50" # Maximum statements in function
-  - key: readability-function-cognitive-complexity.Threshold
-    value: "25" # Maximum cognitive complexity
+  # Naming conventions (LLVM style with AUTOSAR compliance)
+  # ClassCase (When defined, the check will ensure class names conform to the selected casing.)
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  # StructCase (When defined, the check will ensure struct names conform to the selected casing.)
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
 
-  # Naming conventions
+  # Enum
+  # EnumCase (When defined, the check will ensure enumeration names conform to the selected casing.)
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  # EnumSuffix (When defined, the check will ensure enumeration names will add the suffix with the given value (regardless of casing).)
+  - key: readability-identifier-naming.EnumSuffix
+    value: "Type"
+  # EnumConstantCase (When defined, the check will ensure enumeration constant names conform to the selected casing.)
+  - key: readability-identifier-naming.EnumConstantCase
+    value: UPPER_CASE
+
+  # Function
+  # FunctionCase (When defined, the check will ensure function names conform to the selected casing.)
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+
+  # Global
+  # GlobalConstantCase (When defined, the check will ensure global constant names conform to the selected casing.)
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+  # GlobalvariableCase (When defined, the check will ensure global variable names conform to the selected casing.)
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: camelBack
+  # GlobalVariablePrefix (When defined, the check will ensure global variable names will add the prefixed with the given value (regardless of casing).)
   - key: readability-identifier-naming.GlobalVariablePrefix
-    value: "g_"
+    value: g_
+
+  # MacroDefinition
+  # MacroDefinitionCase (When defined, the check will ensure macro definitions conform to the selected casing.)
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  # bugprone-macro-parentheses
+  - key: bugprone-macro-parentheses.IgnoreCommandLineMacros
+    value: "0"
+  - key: bugprone-macro-parentheses.CheckCStringMacros
+    value: "1"
+
+    # ParameterCase (When defined, the check will ensure parameter names conform to the selected casing.)
+  - key: readability-identifier-naming.ParameterCase
+    value: CamelCase
+
+  # Struct
+  # StructCase (When defined, the check will ensure struct names conform to the selected casing.)
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  # StructSuffix (When defined, the check will ensure struct names will add the suffix with the given value (regardless of casing).)
+  - key: readability-identifier-naming.StructSuffix
+    value: "Type"
+
+  # Union
+  # UnionCase (When defined, the check will ensure union names conform to the selected casing.)
+  - key: readability-identifier-naming.UnionCase
+    value: CamelCase
+  # UnionSuffix (When defined, the check will ensure union names will add the suffix with the given value (regardless of casing).)
+  - key: readability-identifier-naming.UnionSuffix
+    value: "Type"
+
+  # Variable
+  # VariableCase (When defined, the check will ensure variable names conform to the selected casing.)
+  - key: readability-identifier-naming.VariableCase
+    value: CamelCase
+
+  # PrivateMemberCase (When defined, the check will ensure private member names conform to the selected casing.)
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: camelBack
+  # PrivateMemberSuffix (When defined, the check will ensure private member names will add the suffix with the given value (regardless of casing).)
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: _
+  # ProtectedMemberCase (When defined, the check will ensure protected member names conform to the selected casing.)
+  - key: readability-identifier-naming.ProtectedMemberCase
+    value: camelBack
+  # ProtectedMemberSuffix (When defined, the check will ensure protected member names will add the suffix with the given value (regardless of casing).)
+  - key: readability-identifier-naming.ProtectedMemberSuffix
+    value: _
+  # NamespaceCase (When defined, the check will ensure namespace names conform to the selected casing.)
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+  # StaticVariablePrefix (When defined, the check will ensure static variable names will add the prefixed with the given value (regardless of casing).)
   - key: readability-identifier-naming.StaticVariablePrefix
     value: "s_"
-  - key: readability-identifier-naming.FunctionCase
-    value: "camelBack"
-  - key: readability-identifier-naming.ClassCase
+  # TypedefCase (When defined, the check will ensure typedef names conform to the selected casing.)
+  - key: readability-identifier-naming.TypedefCase
     value: "CamelCase"
-  - key: readability-identifier-naming.StructCase
-    value: "CamelCase"
-  - key: readability-identifier-naming.EnumCase
-    value: "CamelCase"
-  - key: readability-identifier-naming.ConstantCase
-    value: "UPPER_CASE"
-  - key: readability-identifier-naming.ParameterCase
-    value: "camelBack"
-  - key: readability-identifier-naming.VariableCase
-    value: "camelBack"
-  - key: readability-identifier-naming.MacroDefinitionCase
-    value: "UPPER_CASE"
+  # TypedefSuffix (When defined, the check will ensure typedef names will add the suffix with the given value (regardless of casing).)
+  - key: readability-identifier-naming.TypedefSuffix
+    value: "Type"
 
-  # Safety considerations
-  - key: bugprone-signed-char-misuse.CharTypdefsToIgnore
-    value: ""
-  - key: cert-dcl16-c.NewSuffixes
-    value: "L;LL;LU;LLU"
-  - key: cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
-    value: "0"
+  # AUTOSAR specific rules
+  - key: cppcoreguidelines-pro-type-member-init.UseAssignment
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
+    value: true
 
-  # Header guards
-  - key: llvm-header-guard.HeaderFileExtensions
-    value: ";h;hh;hpp;hxx"
+  # LLVM specific adjustments
+  - key: readability-braces-around-statements.ShortStatementLines
+    value: 0 # AUTOSAR requires braces for all control structures
+

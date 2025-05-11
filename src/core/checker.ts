@@ -7,29 +7,32 @@ import { RuleRegistry } from "../rules/ruleRegistry";
 import { ConfigManager } from "../utils/config";
 
 /**
- * CubtekChecker is responsible for performing code quality checks on C/C++ files.
- * It combines clang-tidy static analysis with custom rule checks to provide
- * comprehensive diagnostics for the code.
+ * Performs code quality checks on C/C++ files using clang-tidy and custom rules.
+ *
+ * This class combines industry standard static analysis with CubTEK-specific
+ * rule checks to provide comprehensive diagnostics for code quality.
  */
 export class CubtekChecker {
-  /** Registry containing all available rules */
+  /** Registry of all available checking rules. */
   private ruleRegistry: RuleRegistry;
 
   /**
-   * Creates a new instance of the CubtekChecker.
+   * Creates a new CubtekChecker instance.
    *
-   * @param configManager - The configuration manager that controls rule settings and checker options
+   * @param configManager Configuration manager controlling rule settings and options.
    */
   constructor(private readonly configManager: ConfigManager) {
     this.ruleRegistry = new RuleRegistry(configManager);
   }
 
   /**
-   * Checks a document for code quality issues using both clang-tidy and custom rules.
-   * Only processes C/C++ files; returns empty array for other file types.
+   * Checks a document for code quality issues.
    *
-   * @param document - The VSCode text document to check
-   * @returns A promise that resolves to an array of diagnostic issues found in the document
+   * Combines clang-tidy analysis with custom rules to identify potential problems.
+   * Only processes C/C++ files and silently returns empty array for other file types.
+   *
+   * @param document Document to analyze for code quality issues.
+   * @returns Promise resolving to array of diagnostic issues found in the document.
    */
   async checkDocument(
     document: vscode.TextDocument
@@ -59,12 +62,13 @@ export class CubtekChecker {
   }
 
   /**
-   * Runs clang-tidy on the document to find standard C/C++ code quality issues.
-   * Creates a temporary file to run clang-tidy and collects its output.
+   * Runs clang-tidy on the document to find standard C/C++ issues.
    *
-   * @param document - The VSCode text document to check
-   * @returns A promise that resolves to an array of diagnostics from clang-tidy
-   * @throws Error if clang-tidy is not installed or encounters an error during execution
+   * Creates a temporary file for clang-tidy processing and parses its output.
+   *
+   * @param document Document to check with clang-tidy.
+   * @return Promise resolving to diagnostics from clang-tidy.
+   * @throws Error if clang-tidy isn't installed or fails during execution.
    * @private
    */
   private async runClangTidy(
@@ -139,13 +143,14 @@ export class CubtekChecker {
   }
 
   /**
-   * Parses the output from clang-tidy into VSCode diagnostic objects.
-   * Extracts information including file path, line numbers, column positions,
-   * severity levels, messages, and rule identifiers.
+   * Converts clang-tidy output to VSCode diagnostic objects.
    *
-   * @param output - The string output from the clang-tidy process
-   * @param document - The document being checked
-   * @returns An array of VSCode diagnostics created from the clang-tidy output
+   * Parses the text output to extract file locations, severity levels,
+   * messages, and rule identifiers.
+   *
+   * @param output String output from the clang-tidy process.
+   * @param document Document being checked.
+   * @return Array of diagnostics created from the clang-tidy output.
    * @private
    */
   private parseClangTidyOutput(
@@ -210,12 +215,13 @@ export class CubtekChecker {
   }
 
   /**
-   * Runs all enabled custom rule checks on the document.
-   * Each rule is executed independently and all resulting diagnostics are collected.
-   * Errors in individual rules are caught to prevent the entire check from failing.
+   * Executes all enabled custom rule checks on the document.
    *
-   * @param document - The VSCode text document to check
-   * @returns A promise that resolves to an array of diagnostics from custom rules
+   * Each rule runs independently to isolate failures and prevent one rule
+   * from blocking others.
+   *
+   * @param document Document to check with custom rules.
+   * @return Promise resolving to array of diagnostics from custom rules.
    * @private
    */
   private async runCustomRuleChecks(

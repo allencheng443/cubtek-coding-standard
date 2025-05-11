@@ -6,8 +6,8 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { CubtekFormatter } from "../../core/formatter";
-import { ConfigManager } from "../../utils/config";
+import { CubtekFormatter } from "../../src/core/formatter";
+import { ConfigManager } from "../../src/utils/config";
 
 /**
  * Custom clang-format configuration for testing

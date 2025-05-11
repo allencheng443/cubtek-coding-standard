@@ -3,23 +3,24 @@
     "module": "Node16",
     "target": "ES2022",
     "outDir": "out",
-    "lib": [
-      "ES2022"
-    ],
+    "lib": ["ES2022"],
     "sourceMap": true,
     "rootDir": "src",
-    "strict": true, /* enable all strict type-checking options */
+    "strict": true /* enable all strict type-checking options */,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */
     /* Additional Checks */
     // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     // "noUnusedParameters": true,  /* Report errors on unused parameters. */
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "out", "test"]
 }

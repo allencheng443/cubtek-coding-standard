@@ -1,33 +1,32 @@
 /**
- * @fileoverview Provides quick fix capabilities for CubTEK diagnostics within VS Code.
- * This module implements code actions for various CubTEK-specific issues.
+ * Provides quick fix capabilities for CubTEK diagnostics within VS Code.
+ *
+ * @fileoverview Implements code actions for various CubTEK-specific issues.
  */
 import * as vscode from "vscode";
 
 /**
- * Provider class that implements quick fixes for CubTEK diagnostics.
- * This class analyzes diagnostics from CubTEK and clang-tidy sources and
- * provides appropriate code actions to fix detected issues.
+ * Provider for CubTEK diagnostic quick fixes.
+ *
+ * Analyzes diagnostics from CubTEK and clang-tidy sources and provides
+ * appropriate code actions to fix detected issues.
  */
 export class CubtekQuickFixProvider implements vscode.CodeActionProvider {
   /**
-   * List of code action kinds this provider can handle.
-   * Currently only supports QuickFix actions.
+   * The list of code action kinds this provider handles.
    */
   public static readonly providedCodeActionKinds = [
     vscode.CodeActionKind.QuickFix,
   ];
 
   /**
-   * Provides code actions for diagnostics in the given context.
-   * This method filters diagnostics to only handle CubTEK-related issues
-   * and creates specific code actions based on the diagnostic code.
+   * Provides code actions for CubTEK diagnostics.
    *
-   * @param document - The document in which the command was invoked
-   * @param range - The selected range or current position in the document
-   * @param context - The context containing relevant diagnostics
-   * @param token - A cancellation token to signal if the request is cancelled
-   * @returns An array of code actions or commands, or a promise thereof
+   * @param {vscode.TextDocument} document - The document containing diagnostics
+   * @param {vscode.Range|vscode.Selection} range - The selected range or cursor position
+   * @param {vscode.CodeActionContext} context - Context containing relevant diagnostics
+   * @param {vscode.CancellationToken} token - Cancellation token
+   * @return {vscode.ProviderResult<(vscode.CodeAction|vscode.Command)[]>} Array of applicable code actions
    */
   provideCodeActions(
     document: vscode.TextDocument,
@@ -84,14 +83,15 @@ export class CubtekQuickFixProvider implements vscode.CodeActionProvider {
   }
 
   /**
-   * Creates a code action to fix function length issues (CUBTEK-FUNC-001).
-   * This action suggests extracting part of the function to reduce its length,
-   * using the built-in refactoring tools in the editor.
+   * Creates a code action to fix function length issues.
    *
-   * @param document - The document containing the function to refactor
-   * @param range - The range of text covered by the diagnostic
-   * @param diagnostic - The diagnostic describing the function length issue
-   * @returns A code action that triggers the extract function refactoring
+   * Suggests extracting part of the function using built-in refactoring tools.
+   *
+   * @param {vscode.TextDocument} document - The document containing the function
+   * @param {vscode.Range} range - The diagnostic range
+   * @param {vscode.Diagnostic} diagnostic - The function length diagnostic
+   * @return {vscode.CodeAction} An action triggering extract function refactoring
+   * @private
    */
   private createFunctionLengthFixAction(
     document: vscode.TextDocument,
@@ -116,14 +116,15 @@ export class CubtekQuickFixProvider implements vscode.CodeActionProvider {
   }
 
   /**
-   * Creates a code action to fix naming convention issues (CUBTEK-NAME-001).
-   * This action automatically renames variables according to the project's
-   * naming conventions, applying the appropriate prefix or casing.
+   * Creates a code action to fix naming convention issues.
    *
-   * @param document - The document containing the variable to rename
-   * @param range - The range of text covered by the diagnostic
-   * @param diagnostic - The diagnostic describing the naming convention issue
-   * @returns A code action with a workspace edit to rename the variable
+   * Automatically renames variables with the appropriate prefix or casing.
+   *
+   * @param {vscode.TextDocument} document - The document containing the variable
+   * @param {vscode.Range} range - The diagnostic range
+   * @param {vscode.Diagnostic} diagnostic - The naming convention diagnostic
+   * @return {vscode.CodeAction} An action with an edit to rename the variable
+   * @private
    */
   private createNamingConventionFixAction(
     document: vscode.TextDocument,
@@ -160,14 +161,15 @@ export class CubtekQuickFixProvider implements vscode.CodeActionProvider {
   }
 
   /**
-   * Creates a generic code action for clang-tidy related issues.
-   * This action provides a link to the official documentation for the specific
-   * clang-tidy check that was violated.
+   * Creates a generic code action for clang-tidy issues.
    *
-   * @param document - The document containing the issue
-   * @param range - The range of text covered by the diagnostic
-   * @param diagnostic - The diagnostic from clang-tidy
-   * @returns A code action that opens the relevant documentation in a browser
+   * Provides a link to the official documentation for the clang-tidy check.
+   *
+   * @param {vscode.TextDocument} document - The document containing the issue
+   * @param {vscode.Range} range - The diagnostic range
+   * @param {vscode.Diagnostic} diagnostic - The clang-tidy diagnostic
+   * @return {vscode.CodeAction} An action linking to relevant documentation
+   * @private
    */
   private createGenericFixAction(
     document: vscode.TextDocument,

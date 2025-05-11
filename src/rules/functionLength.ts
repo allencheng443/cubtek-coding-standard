@@ -6,6 +6,11 @@
  * test, and maintain, making this rule important for code quality.
  */
 import * as vscode from "vscode";
+import {
+  CPP_PATTERNS,
+  DEFAULT_SETTINGS,
+  DIAGNOSTIC_MESSAGES,
+} from "../constants";
 import { Rule } from "./ruleBase";
 
 /**
@@ -41,11 +46,11 @@ export class FunctionLengthRule extends Rule {
 
     // Get configuration for maximum lines
     // Default to 50 if not specified
-    const maxLines = 50;
+    const maxLines = DEFAULT_SETTINGS.MAX_FUNCTION_LINES;
 
     // Find all function definitions
     // This is a simplified regex for C/C++ functions
-    const functionPattern = /\b(\w+)\s+(\w+)\s*\([^)]*\)\s*(?:const\s*)?\s*{/g;
+    const functionPattern = CPP_PATTERNS.FUNCTION;
     let match: RegExpExecArray | null;
 
     while ((match = functionPattern.exec(text)) !== null) {
@@ -66,10 +71,13 @@ export class FunctionLengthRule extends Rule {
             functionPos.translate(0, functionName.length)
           );
 
-          const diagnostic = this.createDiagnostic(
-            range,
-            `Function "${functionName}" is ${functionLines} lines long (maximum allowed is ${maxLines})`
+          const message = DIAGNOSTIC_MESSAGES.FUNCTION_LENGTH(
+            functionName,
+            functionLines,
+            maxLines
           );
+
+          const diagnostic = this.createDiagnostic(range, message);
 
           diagnostics.push(diagnostic);
         }

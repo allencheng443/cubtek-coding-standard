@@ -1,52 +1,46 @@
 /**
  * Logging utility for the CubTEK Coding Standard extension.
- * Provides standardized logging capabilities with different severity levels.
- * @module src/utils/logger
  */
 
 import * as vscode from "vscode";
 
 /**
- * Enum representing the log levels available for logging.
- * Used to control verbosity of logging output.
- * @enum {number}
+ * Log levels for controlling logging verbosity.
  */
 export enum LogLevel {
-  /** Detailed information, typically of interest only when diagnosing problems */
+  /** Detailed information for problem diagnosis */
   Debug = 0,
 
-  /** Informational messages that highlight normal application progress */
+  /** Normal application progress information */
   Info = 1,
 
-  /** Potentially harmful situations that might indicate problems */
+  /** Potential problems */
   Warning = 2,
 
-  /** Error events that might still allow the application to continue running */
+  /** Errors allowing application to continue running */
   Error = 3,
 
-  /** Critical errors that prevent normal program execution */
+  /** Critical errors preventing normal execution */
   Critical = 4,
 
-  /** No logging should be performed */
+  /** No logging */
   None = 99,
 }
 
 /**
- * Static utility class for logging messages with different severity levels.
- * Provides formatted logging to VS Code's output channel.
+ * Static utility for logging messages with different severity levels.
  */
 export class Logger {
-  /** The VS Code output channel used for displaying log messages */
+  /** VS Code output channel for displaying logs */
   private static outputChannel: vscode.OutputChannel;
 
-  /** The current log level threshold; messages below this level won't be logged */
+  /** Current log level threshold */
   private static currentLogLevel: LogLevel = LogLevel.Info;
 
   /**
    * Initializes the logger with a VS Code output channel.
-   * Should be called once during extension activation.
    *
-   * @param {vscode.ExtensionContext} context - The extension context
+   * @param context Extension context
    */
   public static initialize(context: vscode.ExtensionContext): void {
     this.outputChannel = vscode.window.createOutputChannel(
@@ -63,7 +57,6 @@ export class Logger {
 
   /**
    * Updates the current log level from VS Code configuration.
-   * Should be called when configuration changes.
    */
   public static updateLogLevel(): void {
     const config = vscode.workspace.getConfiguration("cubtek");
@@ -94,13 +87,12 @@ export class Logger {
   }
 
   /**
-   * Logs a debug message. Used for detailed troubleshooting information.
+   * Logs a debug message.
    *
-   * @param {string} message - The message format string, with optional placeholders {0}, {1}, etc.
-   * @param {...any[]} args - Arguments to be formatted into the message
+   * @param message Message format string with optional placeholders {0}, {1}, etc.
+   * @param args Arguments to format into the message
    *
    * @example
-   * // Log a debug message with formatting
    * Logger.debug("Processing file {0} with {1} rules", filename, ruleCount);
    */
   public static debug(message: string, ...args: any[]): void {
@@ -108,13 +100,12 @@ export class Logger {
   }
 
   /**
-   * Logs an informational message about normal application progress.
+   * Logs an informational message.
    *
-   * @param {string} message - The message format string, with optional placeholders {0}, {1}, etc.
-   * @param {...any[]} args - Arguments to be formatted into the message
+   * @param message Message format string with optional placeholders {0}, {1}, etc.
+   * @param args Arguments to format into the message
    *
    * @example
-   * // Log an info message
    * Logger.info("Found {0} style issues in the document", issues.length);
    */
   public static info(message: string, ...args: any[]): void {
@@ -122,27 +113,25 @@ export class Logger {
   }
 
   /**
-   * Logs a warning message about potential problems.
+   * Logs a warning message.
    *
-   * @param {string} message - The message format string, with optional placeholders {0}, {1}, etc.
-   * @param {...any[]} args - Arguments to be formatted into the message
+   * @param message Message format string with optional placeholders {0}, {1}, etc.
+   * @param args Arguments to format into the message
    *
    * @example
-   * // Log a warning message
-   * Logger.warning("Rule {0} found potential issue with coding standards", ruleId);
+   * Logger.warning("Rule {0} found potential issue", ruleId);
    */
   public static warning(message: string, ...args: any[]): void {
     this.log(LogLevel.Warning, message, ...args);
   }
 
   /**
-   * Logs an error message about failures in the extension.
+   * Logs an error message.
    *
-   * @param {string} message - The message format string, with optional placeholders {0}, {1}, etc.
-   * @param {...any[]} args - Arguments to be formatted into the message
+   * @param message Message format string with optional placeholders {0}, {1}, etc.
+   * @param args Arguments to format into the message
    *
    * @example
-   * // Log an error message
    * Logger.error("Failed to parse document: {0}", error.message);
    */
   public static error(message: string, ...args: any[]): void {
@@ -150,13 +139,12 @@ export class Logger {
   }
 
   /**
-   * Logs a critical error message about severe failures.
+   * Logs a critical error message.
    *
-   * @param {string} message - The message format string, with optional placeholders {0}, {1}, etc.
-   * @param {...any[]} args - Arguments to be formatted into the message
+   * @param message Message format string with optional placeholders {0}, {1}, etc.
+   * @param args Arguments to format into the message
    *
    * @example
-   * // Log a critical error message
    * Logger.critical("Extension failed to activate: {0}", error.message);
    */
   public static critical(message: string, ...args: any[]): void {
@@ -164,13 +152,12 @@ export class Logger {
   }
 
   /**
-   * Internal method to log a message at a specific level.
-   * Handles formatting and channel output based on the current log level.
+   * Logs a message at a specific level.
    *
+   * @param level Severity level of the message
+   * @param message Message format string
+   * @param args Arguments to format into the message
    * @private
-   * @param {LogLevel} level - The severity level of the message
-   * @param {string} message - The message format string
-   * @param {...any[]} args - Arguments to be formatted into the message
    */
   private static log(level: LogLevel, message: string, ...args: any[]): void {
     // Skip if the message's level is below the current log level threshold
@@ -202,10 +189,10 @@ export class Logger {
   /**
    * Formats a message by replacing placeholders with arguments.
    *
+   * @param message Message format string
+   * @param args Arguments to format into the message
+   * @return Formatted message
    * @private
-   * @param {string} message - The message format string
-   * @param {any[]} args - The arguments to format into the message
-   * @returns {string} The formatted message
    */
   private static formatMessage(message: string, args: any[]): string {
     if (!args || args.length === 0) {
@@ -219,11 +206,11 @@ export class Logger {
   }
 
   /**
-   * Formats a value for logging, handling objects and arrays appropriately.
+   * Formats a value for logging.
    *
+   * @param value Value to format
+   * @return Formatted value as a string
    * @private
-   * @param {any} value - The value to format
-   * @returns {string} The formatted value as a string
    */
   private static formatValue(value: any): string {
     if (value === undefined) {
@@ -248,9 +235,9 @@ export class Logger {
   /**
    * Gets the prefix string for a log level.
    *
+   * @param level Log level to get a prefix for
+   * @return Prefix string for the log level
    * @private
-   * @param {LogLevel} level - The log level to get a prefix for
-   * @returns {string} The prefix string for the log level
    */
   private static getLevelPrefix(level: LogLevel): string {
     switch (level) {

@@ -1,49 +1,18 @@
 /**
- * Diagnostic utilities for the CubTEK Coding Standard extension.
- * Provides tools for creating, filtering, and processing diagnostics.
- * @module src/utils/diagnostics
+ * Utilities for creating, filtering, and processing diagnostics.
+ * @fileoverview Diagnostic tools for the CubTEK Coding Standard extension.
  */
 
+import { DiagnosticLocationType } from "@/types";
 import * as vscode from "vscode";
 import { ConfigManager } from "./config";
 import { Logger } from "./logger";
 
 /**
- * Enum representing the type of code location where a diagnostic occurs.
- * Used to determine the most appropriate highlighting strategy.
- * @enum {string}
+ * Maps severity strings to VSCode DiagnosticSeverity enum values.
+ * @const {!Object<string, vscode.DiagnosticSeverity>}
  */
-export enum DiagnosticLocationType {
-  /** Diagnostics related to function declarations or definitions */
-  Function = "function",
-
-  /** Diagnostics related to variable declarations or usage */
-  Variable = "variable",
-
-  /** Diagnostics related to code statements */
-  Statement = "statement",
-
-  /** Diagnostics related to expressions */
-  Expression = "expression",
-
-  /** Diagnostics related to comments */
-  Comment = "comment",
-
-  /** Diagnostics related to include directives */
-  Include = "include",
-
-  /** Diagnostics related to type definitions */
-  Typedef = "typedef",
-
-  /** Diagnostics related to macro definitions or usage */
-  Macro = "macro",
-}
-
-/**
- * Mapping of severity strings to VSCode DiagnosticSeverity enum values.
- * @type {Record<string, vscode.DiagnosticSeverity>}
- */
-const severityMap: Record<string, vscode.DiagnosticSeverity> = {
+const severityMap = {
   error: vscode.DiagnosticSeverity.Error,
   warning: vscode.DiagnosticSeverity.Warning,
   information: vscode.DiagnosticSeverity.Information,
@@ -51,29 +20,26 @@ const severityMap: Record<string, vscode.DiagnosticSeverity> = {
 };
 
 /**
- * Utility class providing methods for creating and manipulating diagnostics.
- * Used by rules and checkers to create consistent diagnostic messages.
+ * Utility for creating and manipulating diagnostics.
  */
 export class DiagnosticUtility {
   /**
-   * Creates a new DiagnosticUtility instance.
-   *
-   * @param {ConfigManager} configManager - The configuration manager to use for rule settings
+   * @param {!ConfigManager} configManager Configuration manager for rule settings
    */
   constructor(private readonly configManager: ConfigManager) {}
 
   /**
-   * Creates a fully configured diagnostic object with appropriate severity and metadata.
+   * Creates a diagnostic object with severity and metadata.
    *
-   * @param {vscode.TextDocument} document - The document where the diagnostic occurs
-   * @param {vscode.Range} range - The range in the document where the diagnostic applies
-   * @param {string} message - The diagnostic message to display to the user
-   * @param {string} ruleId - The ID of the rule that produced this diagnostic
-   * @param {DiagnosticLocationType} [locationType=DiagnosticLocationType.Statement] - The type of code location
-   * @returns {vscode.Diagnostic} A fully configured diagnostic object
+   * @param {!vscode.TextDocument} document Document where the diagnostic occurs
+   * @param {!vscode.Range} range Range where the diagnostic applies
+   * @param {string} message Diagnostic message to display
+   * @param {string} ruleId ID of the rule that produced this diagnostic
+   * @param {DiagnosticLocationType=} locationType Type of code location
+   *     (defaults to Statement)
+   * @return {!vscode.Diagnostic} Configured diagnostic object
    *
    * @example
-   * // Create a basic diagnostic for a style issue
    * const diagnostic = diagnosticUtility.createDiagnostic(
    *   document,
    *   range,
@@ -128,18 +94,16 @@ export class DiagnosticUtility {
   }
 
   /**
-   * Creates a diagnostic specifically for variable naming issues.
-   * Formats the message consistently for naming convention violations.
+   * Creates a diagnostic for variable naming issues.
    *
-   * @param {vscode.TextDocument} document - The document containing the variable
-   * @param {string} varName - The name of the variable with the issue
-   * @param {vscode.Range} varRange - The range where the variable is defined
-   * @param {string} expectedPrefix - The expected prefix for the variable
-   * @param {string} ruleId - The ID of the naming rule
-   * @returns {vscode.Diagnostic} A diagnostic for the naming issue
+   * @param {!vscode.TextDocument} document Document containing the variable
+   * @param {string} varName Name of the variable with the issue
+   * @param {!vscode.Range} varRange Range where the variable is defined
+   * @param {string} expectedPrefix Expected prefix for the variable
+   * @param {string} ruleId ID of the naming rule
+   * @return {!vscode.Diagnostic} Diagnostic for the naming issue
    *
    * @example
-   * // Create a diagnostic for a global variable missing a prefix
    * const diagnostic = diagnosticUtility.createVariableNamingDiagnostic(
    *   document,
    *   "count",
@@ -167,18 +131,16 @@ export class DiagnosticUtility {
 
   /**
    * Creates a diagnostic for function length issues.
-   * Used to flag functions that exceed the maximum allowed length.
    *
-   * @param {vscode.TextDocument} document - The document containing the function
-   * @param {string} funcName - The name of the function that's too long
-   * @param {vscode.Range} funcRange - The range of the function header
-   * @param {number} lineCount - The actual number of lines in the function
-   * @param {number} maxAllowed - The maximum allowed number of lines
-   * @param {string} ruleId - The ID of the function length rule
-   * @returns {vscode.Diagnostic} A diagnostic for the function length issue
+   * @param {!vscode.TextDocument} document Document containing the function
+   * @param {string} funcName Name of the function that's too long
+   * @param {!vscode.Range} funcRange Range of the function header
+   * @param {number} lineCount Actual number of lines in the function
+   * @param {number} maxAllowed Maximum allowed number of lines
+   * @param {string} ruleId ID of the function length rule
+   * @return {!vscode.Diagnostic} Diagnostic for the function length issue
    *
    * @example
-   * // Create a diagnostic for a function that's too long
    * const diagnostic = diagnosticUtility.createFunctionLengthDiagnostic(
    *   document,
    *   "processData",
@@ -208,16 +170,14 @@ export class DiagnosticUtility {
 
   /**
    * Creates a diagnostic for style-related issues.
-   * Used for formatting, whitespace, and style convention violations.
    *
-   * @param {vscode.TextDocument} document - The document containing the style issue
-   * @param {vscode.Range} range - The range where the style issue occurs
-   * @param {string} styleProblem - Description of the style problem
-   * @param {string} ruleId - The ID of the style rule
-   * @returns {vscode.Diagnostic} A diagnostic for the style issue
+   * @param {!vscode.TextDocument} document Document containing the style issue
+   * @param {!vscode.Range} range Range where the style issue occurs
+   * @param {string} styleProblem Description of the style problem
+   * @param {string} ruleId ID of the style rule
+   * @return {!vscode.Diagnostic} Diagnostic for the style issue
    *
    * @example
-   * // Create a diagnostic for a style issue
    * const diagnostic = diagnosticUtility.createStyleDiagnostic(
    *   document,
    *   range,
@@ -242,14 +202,12 @@ export class DiagnosticUtility {
 
   /**
    * Finds all occurrences of a symbol in a document.
-   * Used for quick fixes and refactoring operations.
    *
-   * @param {vscode.TextDocument} document - The document to search in
-   * @param {string} symbolName - The symbol name to find
-   * @returns {vscode.Range[]} An array of ranges for all occurrences of the symbol
+   * @param {!vscode.TextDocument} document Document to search in
+   * @param {string} symbolName Symbol name to find
+   * @return {!Array<!vscode.Range>} Ranges for all occurrences of the symbol
    *
    * @example
-   * // Find all occurrences of a variable name
    * const ranges = diagnosticUtility.findAllSymbolReferences(document, "count");
    */
   findAllSymbolReferences(
@@ -276,17 +234,15 @@ export class DiagnosticUtility {
   }
 
   /**
-   * Finds the most appropriate range to highlight for a diagnostic.
-   * Attempts to identify the relevant code element instead of highlighting the entire line.
+   * Finds the most appropriate range for a diagnostic.
    *
-   * @param {vscode.TextDocument} document - The document containing the line
-   * @param {number} lineIndex - The zero-based line index to analyze
-   * @param {DiagnosticLocationType} locationType - The type of code location to find
-   * @param {string} [identifierHint] - Optional hint to help find the relevant identifier
-   * @returns {vscode.Range} The best range to highlight for the diagnostic
+   * @param {!vscode.TextDocument} document Document containing the line
+   * @param {number} lineIndex Zero-based line index to analyze
+   * @param {DiagnosticLocationType} locationType Type of code location to find
+   * @param {string=} identifierHint Optional hint to help find the identifier
+   * @return {!vscode.Range} Best range for the diagnostic
    *
    * @example
-   * // Find the best range for a function name diagnostic
    * const range = diagnosticUtility.findBestDiagnosticRange(
    *   document,
    *   10,
@@ -398,16 +354,13 @@ export class DiagnosticUtility {
   }
 
   /**
-   * Cleans C/C++ code by removing comments and string literals for analysis.
-   * Useful for pattern matching and structure analysis without interference from comments or strings.
+   * Cleans C/C++ code by removing comments and string literals.
    *
-   * @param {string} code - The original source code
-   * @returns {string} The cleaned code with comments and strings removed/replaced
+   * @param {string} code Original source code
+   * @return {string} Cleaned code with comments and strings removed
    *
    * @example
-   * // Clean code for analysis
    * const cleanedCode = diagnosticUtility.cleanCodeForAnalysis(sourceCode);
-   * const hasMultipleReturns = cleanedCode.match(/\breturn\b/g).length > 1;
    */
   cleanCodeForAnalysis(code: string): string {
     // Replace all string literals
@@ -424,15 +377,13 @@ export class DiagnosticUtility {
 
   /**
    * Filters and sorts diagnostics based on severity and rule IDs.
-   * Useful for displaying the most relevant diagnostics to the user.
    *
-   * @param {vscode.Diagnostic[]} diagnostics - The array of diagnostics to filter and sort
-   * @param {vscode.DiagnosticSeverity} [severityThreshold] - Optional threshold to filter by severity
-   * @param {string[]} [ruleFilter] - Optional array of rule IDs to include
-   * @returns {vscode.Diagnostic[]} Filtered and sorted diagnostics
+   * @param {!Array<!vscode.Diagnostic>} diagnostics Array of diagnostics to filter
+   * @param {vscode.DiagnosticSeverity=} severityThreshold Optional severity threshold
+   * @param {Array<string>=} ruleFilter Optional array of rule IDs to include
+   * @return {!Array<!vscode.Diagnostic>} Filtered and sorted diagnostics
    *
    * @example
-   * // Filter to show only errors and warnings from style rules
    * const filtered = diagnosticUtility.filterAndSortDiagnostics(
    *   allDiagnostics,
    *   vscode.DiagnosticSeverity.Warning,
@@ -474,25 +425,23 @@ export class DiagnosticUtility {
   }
 
   /**
-   * Converts clang-tidy diagnostic output to VSCode diagnostic objects.
-   * Enables integration of clang-tidy results with the extension's diagnostics.
+   * Converts clang-tidy output to VSCode diagnostic objects.
    *
-   * @param {vscode.TextDocument} document - The document being analyzed
-   * @param {string} tidyOutput - The raw output from clang-tidy
-   * @param {number} line - The 1-based line number from clang-tidy
-   * @param {number} column - The 1-based column number from clang-tidy
-   * @param {string} message - The diagnostic message from clang-tidy
-   * @param {string} ruleId - The clang-tidy rule ID (e.g., "readability-identifier-naming")
-   * @param {string} level - The severity level from clang-tidy (error, warning, etc.)
-   * @returns {vscode.Diagnostic} A VSCode diagnostic representing the clang-tidy issue
+   * @param {!vscode.TextDocument} document Document being analyzed
+   * @param {string} tidyOutput Raw output from clang-tidy
+   * @param {number} line 1-based line number from clang-tidy
+   * @param {number} column 1-based column number from clang-tidy
+   * @param {string} message Diagnostic message from clang-tidy
+   * @param {string} ruleId Clang-tidy rule ID
+   * @param {string} level Severity level from clang-tidy
+   * @return {!vscode.Diagnostic} VSCode diagnostic representing the clang-tidy issue
    *
    * @example
-   * // Parse a clang-tidy output into a VSCode diagnostic
    * const diagnostic = diagnosticUtility.parseClangTidyDiagnostic(
    *   document,
    *   rawOutput,
-   *   15,  // line
-   *   10,  // column
+   *   15,
+   *   10,
    *   "variable 'count' should be named 'g_count'",
    *   "readability-identifier-naming",
    *   "warning"
@@ -558,11 +507,10 @@ export class DiagnosticUtility {
 
   /**
    * Escapes special characters in a string for use in a regular expression.
-   * Ensures that symbols with special meaning in regex are interpreted literally.
    *
+   * @param {string} string String to escape
+   * @return {string} Escaped string safe for use in a RegExp
    * @private
-   * @param {string} string - The string to escape
-   * @returns {string} The escaped string safe for use in a RegExp
    */
   private escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

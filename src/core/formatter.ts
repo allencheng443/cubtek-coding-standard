@@ -1,27 +1,28 @@
 /**
- * Formatter module for C/C++ code using clang-format
- * @module formatter
+ * Module for formatting C/C++ code using clang-format.
  */
 import * as cp from "child_process";
 import * as vscode from "vscode";
 import { ConfigManager } from "../utils/config";
 
 /**
- * Implements C/C++ code formatting functionality for the Cubtek VSCode extension
- * using the clang-format tool
- * @implements {vscode.DocumentFormattingEditProvider}
+ * Provides C/C++ code formatting functionality using the clang-format tool.
+ * Implements VSCode's DocumentFormattingEditProvider interface.
  */
 export class CubtekFormatter implements vscode.DocumentFormattingEditProvider {
   /**
-   * Creates a new instance of the CubtekFormatter
-   * @param {ConfigManager} configManager - Configuration manager for the extension
+   * Creates a new formatter instance.
+   *
+   * @param configManager Configuration manager that provides formatting settings.
    */
   constructor(private readonly configManager: ConfigManager) {}
 
   /**
-   * Provides document formatting edits for C/C++ files
-   * @param {vscode.TextDocument} document - The document to format
-   * @returns {Promise<vscode.TextEdit[]>} Array of text edits to apply to the document
+   * Formats the entire document according to CubTEK's C/C++ coding standards.
+   * Only processes C and C++ files, returns empty array for other file types.
+   *
+   * @param document The document to format.
+   * @returns A promise that resolves to an array of text edits to apply.
    */
   async provideDocumentFormattingEdits(
     document: vscode.TextDocument
@@ -57,11 +58,15 @@ export class CubtekFormatter implements vscode.DocumentFormattingEditProvider {
   }
 
   /**
-   * Formats a document using clang-format
+   * Formats a document by executing clang-format as an external process.
+   *
+   * The method writes the document content to the clang-format process stdin,
+   * then captures and returns the formatted output from stdout.
+   *
+   * @param document The document to format.
+   * @returns A promise that resolves to the formatted text.
+   * @throws {Error} If clang-format is not installed or returns an error.
    * @private
-   * @param {vscode.TextDocument} document - The document to format
-   * @returns {Promise<string>} The formatted document text
-   * @throws {Error} Throws an error if clang-format fails or is not found
    */
   private async formatDocument(document: vscode.TextDocument): Promise<string> {
     return new Promise<string>((resolve, reject) => {
@@ -82,23 +87,17 @@ export class CubtekFormatter implements vscode.DocumentFormattingEditProvider {
         let stdout = "";
         let stderr = "";
 
-        /**
-         * Capture standard output from the clang-format process
-         */
+        // Capture standard output from the clang-format process
         formatProcess.stdout.on("data", (data) => {
           stdout += data.toString();
         });
 
-        /**
-         * Capture standard error from the clang-format process
-         */
+        // Capture standard error from the clang-format process
         formatProcess.stderr.on("data", (data) => {
           stderr += data.toString();
         });
 
-        /**
-         * Handle process completion
-         */
+        // Handle process completion
         formatProcess.on("close", (code) => {
           if (code !== 0) {
             reject(
@@ -110,9 +109,7 @@ export class CubtekFormatter implements vscode.DocumentFormattingEditProvider {
           resolve(stdout);
         });
 
-        /**
-         * Handle process errors (e.g., if clang-format is not installed)
-         */
+        // Handle process errors (e.g., if clang-format is not installed)
         formatProcess.on("error", (err) => {
           if (err.message.includes("ENOENT")) {
             reject(
