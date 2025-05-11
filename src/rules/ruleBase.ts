@@ -1,57 +1,44 @@
 /**
- * Base rule implementation and related interfaces for rule-based linting.
- * This module provides the foundation for creating and managing linting rules.
- * @module ruleBase
+ * @fileoverview Provides base rule implementation and interfaces for the CubTEK linting system.
+ * This module contains the foundation classes and interfaces necessary for defining and
+ * executing code quality rules across the codebase.
+ *
+ * @license MIT
  */
+
 import * as vscode from "vscode";
+import { RuleMetadata } from "../types";
 
 /**
- * Interface that defines the metadata for a linting rule.
- * Contains all identifying information and default settings for a rule.
- * @interface RuleMetadata
- */
-export interface RuleMetadata {
-  /** Unique identifier for the rule */
-  id: string;
-  /** Display name of the rule */
-  name: string;
-  /** Detailed description of what the rule checks for */
-  description: string;
-  /** Category or group that the rule belongs to */
-  category: string;
-  /** Default severity level for rule violations */
-  defaultSeverity: vscode.DiagnosticSeverity;
-}
-
-/**
- * Abstract base class for all linting rules.
- * Provides common functionality for rule management and requires implementation of the check method.
- * @abstract
- * @class Rule
+ * Base class that all linting rules must extend.
+ *
+ * Implements common functionality for rule management including ID retrieval,
+ * enabling/disabling, and severity adjustment. Concrete rule implementations
+ * must provide the check() method to perform the actual code analysis.
  */
 export abstract class Rule {
   /**
-   * Metadata that describes this rule
+   * The rule's metadata defining its identity and default behavior.
    * @protected
    * @readonly
    */
   protected readonly metadata: RuleMetadata;
 
   /**
-   * Whether this rule is enabled
+   * Flag determining if this rule should be applied during analysis.
    * @protected
    */
   protected enabled: boolean;
 
   /**
-   * Current severity level for this rule
+   * Currently active severity level for this rule's diagnostics.
    * @protected
    */
   protected severity: vscode.DiagnosticSeverity;
 
   /**
-   * Creates a new rule instance
-   * @param {RuleMetadata} metadata - The metadata that describes this rule
+   * Initializes a new rule with the provided metadata.
+   * @param metadata Definition of the rule's identity and behavior.
    */
   constructor(metadata: RuleMetadata) {
     this.metadata = metadata;
@@ -60,75 +47,75 @@ export abstract class Rule {
   }
 
   /**
-   * Gets the unique identifier for this rule
-   * @returns {string} The rule's ID from its metadata
+   * Returns the unique identifier of this rule.
+   * @return The rule's ID string.
    */
   getId(): string {
     return this.metadata.id;
   }
 
   /**
-   * Gets the display name of this rule
-   * @returns {string} The rule's name from its metadata
+   * Returns the human-readable name of this rule.
+   * @return The rule's display name.
    */
   getName(): string {
     return this.metadata.name;
   }
 
   /**
-   * Gets the detailed description of this rule
-   * @returns {string} The rule's description from its metadata
+   * Returns the detailed explanation of this rule's purpose.
+   * @return The rule's description text.
    */
   getDescription(): string {
     return this.metadata.description;
   }
 
   /**
-   * Gets the category this rule belongs to
-   * @returns {string} The rule's category from its metadata
+   * Returns the category this rule belongs to.
+   * @return The rule's category string.
    */
   getCategory(): string {
     return this.metadata.category;
   }
 
   /**
-   * Checks if this rule is currently enabled
-   * @returns {boolean} True if the rule is enabled, false otherwise
+   * Returns whether this rule is currently active.
+   * @return True if rule is enabled, false otherwise.
    */
   isEnabled(): boolean {
     return this.enabled;
   }
 
   /**
-   * Enables or disables this rule
-   * @param {boolean} enabled - Set to true to enable the rule, false to disable it
-   * @returns {void}
+   * Sets the active state of this rule.
+   * @param enabled True to enable the rule, false to disable it.
    */
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
   }
 
   /**
-   * Sets the severity level for rule violations
-   * @param {vscode.DiagnosticSeverity} severity - The new severity level to use
-   * @returns {void}
+   * Updates the severity level used for this rule's diagnostics.
+   * @param severity The new severity level to apply.
    */
   setSeverity(severity: vscode.DiagnosticSeverity): void {
     this.severity = severity;
   }
 
   /**
-   * Check document for rule violations
-   * @param {vscode.TextDocument} document - Document to check
-   * @returns {Promise<vscode.Diagnostic[]>} List of diagnostics for any violations found
+   * Analyzes a document for violations of this rule.
+   * Must be implemented by concrete rule classes.
+   * @param document The text document to analyze.
+   * @return A promise resolving to an array of diagnostic objects for any violations found.
    */
   abstract check(document: vscode.TextDocument): Promise<vscode.Diagnostic[]>;
 
   /**
-   * Create a diagnostic for this rule
-   * @param {vscode.Range} range - The range in the document where the issue occurs
-   * @param {string} message - The message to display
-   * @returns {vscode.Diagnostic} A diagnostic object with this rule's information
+   * Creates a properly configured diagnostic for this rule.
+   * @param range The range in the document where the violation occurs.
+   * @param message Human-readable explanation of the violation.
+   * @return A diagnostic object with this rule's metadata attached.
+   * @protected
    */
   protected createDiagnostic(
     range: vscode.Range,

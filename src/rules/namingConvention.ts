@@ -1,27 +1,17 @@
 import * as vscode from "vscode";
+import { CPP_PATTERNS, DIAGNOSTIC_MESSAGES } from "../constants";
 import { Rule } from "./ruleBase";
 
 /**
  * Rule that enforces CubTEK naming conventions in source code.
  *
- * This rule inspects documents for violations of CubTEK's naming conventions:
+ * Checks:
  * - Global variables must have a 'g_' prefix
- * - Function names must follow either camelCase or PascalCase conventions
- *
- * The rule reports warnings for any identified violations, highlighting the
- * specific identifiers that need to be renamed to comply with the conventions.
- *
- * @extends {Rule} Inherits base functionality from the Rule class
+ * - Function names must follow camelCase or PascalCase
  */
 export class NamingConventionRule extends Rule {
   /**
-   * Initializes a new instance of the NamingConventionRule class.
-   *
-   * This constructor sets up the rule with predefined metadata including:
-   * - A unique rule identifier (CUBTEK-NAME-001)
-   * - A descriptive name and description
-   * - The rule category (Style)
-   * - The default severity level (Warning)
+   * Creates a new naming convention rule instance.
    */
   constructor() {
     super({
@@ -35,25 +25,17 @@ export class NamingConventionRule extends Rule {
   }
 
   /**
-   * Analyzes the document text to find naming convention violations.
+   * Analyzes the document for naming convention violations.
    *
-   * This method performs two main checks:
-   * 1. Verifies that global variables are prefixed with 'g_'
-   * 2. Ensures function names follow camelCase or PascalCase conventions
-   *
-   * For each violation found, a diagnostic is created that identifies the
-   * problematic identifier and provides a message explaining the issue.
-   *
-   * @param {vscode.TextDocument} document - The document to analyze for naming convention violations
-   * @returns {Promise<vscode.Diagnostic[]>} A promise that resolves to an array of diagnostics representing the violations found
+   * @param document The document to analyze
+   * @return Array of diagnostics for naming issues found
    */
   async check(document: vscode.TextDocument): Promise<vscode.Diagnostic[]> {
     const diagnostics: vscode.Diagnostic[] = [];
     const text = document.getText();
 
     // Check global variable naming (should start with g_)
-    const globalVarPattern =
-      /\b(?:extern|static)?\s+(?:const\s+)?(?:unsigned\s+)?(?:int|char|float|double|bool|void|\w+_t)\s+(\w+)\s*(?:=|;|\[)/g;
+    const globalVarPattern = CPP_PATTERNS.GLOBAL_VAR;
     let match: RegExpExecArray | null;
 
     while ((match = globalVarPattern.exec(text)) !== null) {
@@ -78,17 +60,16 @@ export class NamingConventionRule extends Rule {
           varPos.translate(0, varName.length)
         );
 
-        const diagnostic = this.createDiagnostic(
-          range,
-          `Global variable "${varName}" should start with "g_" prefix`
-        );
+        const message = DIAGNOSTIC_MESSAGES.GLOBAL_VAR_PREFIX(varName);
+
+        const diagnostic = this.createDiagnostic(range, message);
 
         diagnostics.push(diagnostic);
       }
     }
 
     // Check function naming (should be camelCase or PascalCase)
-    const functionPattern = /\b(\w+)\s+(\w+)\s*\([^)]*\)\s*(?:const\s*)?\s*{/g;
+    const functionPattern = CPP_PATTERNS.FUNCTION;
 
     while ((match = functionPattern.exec(text)) !== null) {
       const functionName = match[2];
@@ -103,10 +84,9 @@ export class NamingConventionRule extends Rule {
           functionPos.translate(0, functionName.length)
         );
 
-        const diagnostic = this.createDiagnostic(
-          range,
-          `Function name "${functionName}" should be camelCase or PascalCase`
-        );
+        const message = DIAGNOSTIC_MESSAGES.FUNCTION_NAMING(functionName);
+
+        const diagnostic = this.createDiagnostic(range, message);
 
         diagnostics.push(diagnostic);
       }
@@ -116,18 +96,11 @@ export class NamingConventionRule extends Rule {
   }
 
   /**
-   * Determines if a given line in the document is inside a function body.
+   * Checks if a line is inside a function body based on brace counting.
    *
-   * This method works by counting opening and closing braces from the beginning
-   * of the document up to the specified line. If the number of opening braces
-   * exceeds closing braces, the line is considered to be inside a function body.
-   *
-   * This approach assumes proper code structure and may not work correctly with
-   * unbalanced braces or certain code formatting styles.
-   *
-   * @param {vscode.TextDocument} document - The document containing the code to analyze
-   * @param {number} lineNumber - The zero-based line number to check
-   * @returns {boolean} True if the line is inside a function body, false otherwise
+   * @param document The document to analyze
+   * @param lineNumber Zero-based line number to check
+   * @return True if inside a function body
    * @private
    */
   private isInsideFunction(
